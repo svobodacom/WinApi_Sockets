@@ -36,17 +36,21 @@ int main()
 
 		connect(s, (const sockaddr*)&sa, sizeof(sa));
 
-		// фун-ия send передает данные по сети через указанный сокет
-		int mas[] = { 0,8,0,3,2024 };
-		send(s, (const char*)mas, sizeof(mas), 0);
+		// клиент может вводить сколько угодно сообщений
+		char message[200];
+		do
+		{
+			printf("message: ");
+			scanf("\n%200[0-9a-zA-Z.,! ]", message);
+			// фун-ия send передает данные по сети через указанный сокет
+			send(s, (const char*)message, sizeof(message), 0);
 
-		// клиент ждет ответ от сервера
-		char st[20];
-		memset(st, 0, sizeof(st));
-		recv(s, st, sizeof(st), 0);
-		printf(st);
+			// получение сообщений клиентом
+			recv(s, message, sizeof(message), 0);
+			std::cout << message << std::endl;
 
-		Sleep(4000);
+		} 
+		while (1);
 	}
 
 	// СЕРВЕР
@@ -59,7 +63,7 @@ int main()
 		// 2-й параметр - размер очереди
 		listen(s, 100);
 
-		int buf[5]; // буфер для приема сообщений от клиента
+		char buf[200]; // буфер для приема сообщений от клиента
 		memset(buf, 0, sizeof(buf));
 
 		SOCKET client_socket;
@@ -75,14 +79,14 @@ int main()
 
 			// фун-ия recv получает данные по указанному сокету
 			// recv возвращает количество прочитанных байт
-			while (recv(client_socket, (char*)buf, sizeof(buf), 0) > 0)
+			while (recv(client_socket, buf, sizeof(buf), 0) > 0)
 			{
-				for (int i = 0; i < 5; i++)
-					std::cout << buf[i] << std::endl;
+				std::cout << buf << std::endl;
 
-				// посылаем ответ клиенту
-				const char reply[20] = "My first reply\0";
-				send(client_socket, reply, sizeof(reply), 0);
+				// отправка сообщений сервером
+				printf("message: ");
+				scanf("\n%200[0-9a-zA-Z.,! ]", buf);
+				send(client_socket, (const char*)buf, sizeof(buf), 0);
 			}	
 		}
 	}
