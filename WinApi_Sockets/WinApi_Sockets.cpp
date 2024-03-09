@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <conio.h>
 // подключение библиотеки WinApi сокетов
 #include <Winsock2.h>
 // отключение ошибки 4996
@@ -19,17 +20,20 @@ void chat(SOCKET s)
 		if (GetKeyState(VK_F1) < 0)
 		{
 			printf("message: ");
-			scanf("\n%200[0-9a-zA-Z.,! ]", message);
+			// считываем все символы из потока ввода, пока они там есть
+			while (getch() != 0);
+			std::cin >> message;
+			//scanf("\n%200[0-9a-zA-Z.,! ]", message);
 			// фун-ия send передает данные по сети через указанный сокет
 			send(s, (const char*)message, sizeof(message), 0);
 		}
-
+        
 		// фун-ия recv получает данные по указанному сокету
 	   // recv возвращает количество прочитанных байт
 		if (recv(s, message, sizeof(message), 0) > 0)
 			std::cout << message << std::endl;
-
-	} while (GetKeyState(VK_ESCAPE) >= 0); // выход с окна клиента черз кнопку ESCAPE
+	} 
+	while (GetKeyState(VK_ESCAPE) >= 0); // выход с окна клиента черз кнопку ESCAPE
 }
 
 
